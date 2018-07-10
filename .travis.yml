@@ -1,0 +1,23 @@
+language: go
+go:
+  - master
+services:
+  - postgresql
+addons:
+  postgresql: "10"
+  apt:
+    packages:
+      - postgresql-10
+      - postgresql-client-10
+dist: trusty
+before_script:
+  - psql -c 'CREATE DATABASE food_test;' -U postgres
+  - psql food_test < food.sql
+env:
+  global:
+  - PGPORT=5433
+  - PGPASSWORD=""
+before_install:
+  - sudo sed -i -e '/local.*peer/s/postgres/all/' -e 's/peer\|md5/trust/g' /etc/postgresql/*/main/pg_hba.conf
+  - sudo service postgresql restart
+  - sleep 1
